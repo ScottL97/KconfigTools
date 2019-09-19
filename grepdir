@@ -1,0 +1,46 @@
+#!/bin/sh
+# grepdir
+while getopts p: OPTION
+do
+	case $OPTION in
+	p)word=$OPTARG;;
+	#echo "Search: $OPTARG";;
+	esac
+done
+if [ -z $word ]
+then
+	echo "Wrong command"
+	exit 1
+fi
+shift $((OPTIND-1))
+if [[ "$1" != "" ]]
+then
+	if [[ -d "$1" ]]
+	then
+		str="$1"
+		#echo "Dir: $str"
+		#echo "----------------"
+	else
+		echo "Wrong path: $1"
+		exit 1
+	fi
+else
+	echo "Please input the path you need to search"
+	exit 1
+fi
+echo "debug str: $str"
+echo "debug word: $word"
+for file in `find $str`
+do
+	if [ -f $file ]
+	then
+		grep -i $word $file
+		if [ $? -eq 0 ]
+		then
+			echo -n "In file: "
+			grep -li $word $file
+			echo "-----------------"
+		fi
+	fi
+done
+exit 0
