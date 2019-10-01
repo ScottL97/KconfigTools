@@ -39,6 +39,7 @@ In file: ./f1
 ## Advantages
 1. 和diff等逐行比较的工具不同，该工具用于查找两个文本文件中相同的行，适合没有顺序要求的配置文件比对。
 2. 可以查找相同行和不同行。
+3. 忽略注释（#开头的行）
 ## Usage
 ```
 root@scott-virtual-machine:~/mylinuxtools# ./compare.sh f1 f2
