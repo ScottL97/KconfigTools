@@ -1,5 +1,6 @@
-#!/bin/sh
-# grepdir
+#!/bin/bash
+# grepi
+
 searchfile() {
 	echo "[Target file]: $1"
 	echo "[Word]: $word"
@@ -8,7 +9,6 @@ searchfile() {
 	if [ $? -eq 0 ]
 	then
 		res=0
-		#grep -li $word $1
 		echo "-----------------"
 	fi
 	return $res

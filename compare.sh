@@ -1,4 +1,5 @@
 #!/bin/bash
+# compare.sh
 
 # $1是要查找的字段，$2是进行查找的字符串
 comparestr() {
@@ -11,14 +12,8 @@ comparestr() {
 	return $res
 }
 
-#while read line
-#do
-#	compareword $line
-#done < ./f1
-
-# todo：参数解析 
 # 必选参数：两个文件路径
-# 默认找相同，-v找不同
+# 默认找相同处，-v找不同处
 common=y
 while getopts v OPTION
 do
