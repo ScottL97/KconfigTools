@@ -1,0 +1,76 @@
+#!/bin/sh
+# grepdir
+searchfile() {
+	echo "[Target file]: $1"
+	echo "[Word]: $word"
+	res=1
+	grep -i $word $1
+	if [ $? -eq 0 ]
+	then
+		res=0
+		#grep -li $word $1
+		echo "-----------------"
+	fi
+	return $res
+}
+
+searchdir() {	
+	echo "[Target dir]: $1"
+	echo "[Word]: $word"
+	res=1
+	for file in `find $1`
+	do
+		if [ -f $file ]
+		then
+			grep -i $word $file
+			if [ $? -eq 0 ]
+			then
+				res=0
+				echo -n "In file: "
+				grep -li $word $file
+				echo "-----------------"
+			fi
+		fi
+	done
+	return $res
+}
+
+ifquiet=n # 默认输出查找信息
+while getopts qp: OPTION
+do
+	case $OPTION in
+	p)word=$OPTARG;;
+	q)ifquiet=y;;
+	esac
+done
+if [ -z $word ]
+then
+	echo "Wrong command"
+	exit 1
+fi
+shift $((OPTIND-1))
+if [ -z "$1" ]
+then
+	echo "Please input the path you need to search"
+	exit 1
+fi
+if [ -d "$1" ] || [ -f "$1" ]
+then
+	if [ $ifquiet = "y" ]
+	then
+		exec 1>/dev/null
+	fi
+	if [ -d "$1" ]
+	then
+		searchdir "$1"
+		exit $?
+	fi	
+	if [ -f "$1" ]
+	then
+		searchfile "$1"
+		exit $?
+	fi
+else
+	echo "Wrong path: $1"
+	exit 1
+fi
