@@ -1,0 +1,84 @@
+#!/bin/bash
+# modifyconfig
+
+modify_include_null() {
+cat $1 | grep -v ^# | while read line
+do
+	if [ $sum -ge $total ]
+	then
+		break
+	fi 
+	key=$(echo $line | awk -F = '{print $1}')
+	if [ -n "$key" ]
+	then
+		value1=$(echo $line | awk -F = '{print $2}')
+		# 查找$2中对应行
+		./grepi -q -p "^$key=" $2
+		if [ $? -eq 0 ]
+		then
+			# 如果$2中的值不同，将$1中的该行替换为$2中的该行
+			value2=$(grep "^$key=" $2 | awk -F = '{print $2}')
+			if [ "$value1" != "$value2" ]
+			then
+				sum=$(expr $sum + 1)
+				echo "[Modify $sum] $key=$value1 to $value2"				
+				sed -i 's/'"$key=$value1"'/'"$key=$value2"'/' $1
+			fi
+		else # 删除$1中存在、$2中不存在的配置项
+			((sum++))
+			echo "[Delete $sum] $key=$value1"
+			sed -i '/'"$key=$value1"'/d' $1
+		fi
+		echo $sum > tmp
+	fi
+done
+# 在$1中添加$2中存在、$1中不存在的配置项
+add_config $2 $1
+}
+
+# 添加$1（对比的配置文件）中有，$2（修改的配置文件）中没有的配置项
+add_config() {
+read sum < tmp
+cat $1 | grep -v ^# | while read line
+do
+	if [ $sum -ge $total ]
+	then
+		break
+	fi
+	key=$(echo $line | awk -F = '{print $1}')
+	if [ -n "$key" ]
+	then
+		value1=$(echo $line | awk -F = '{print $2}')
+		# 查找$2中对应行
+		./grepi -q -p "^$key=" $2
+		if [ $? -ne 0 ]
+		then # 在$2中添加$1中存在、$2中不存在的配置项
+			((sum++))
+			echo "[Add $sum] $key=$value1"
+			sed -i '$a '"$key=$value1"'' $2
+		fi
+		echo $sum > tmp
+	fi	
+done
+}
+
+file1="$1"
+file2="$2"
+total="$3" # 处理行的总数
+version="$4" # 第几次修改
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]
+then
+	echo "Wrong params"
+	exit 1
+fi
+if [ -f ${file1%.*}.${version} ]
+then
+	echo "Exist version"
+	exit 1
+fi 
+cp $file1 ${file1}.bak
+sum=0
+modify_include_null $file1 $file2 # 删除$file1中有、$file2中没有的配置项，修改$file1和$file2都有、但是值不同的配置项为$file2中的值
+cp $file1 ${file1%.*}.${version}
+mv ${file1}.bak $file1
+rm -rf tmp

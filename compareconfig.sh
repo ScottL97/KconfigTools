@@ -35,6 +35,7 @@ do
 				echo "[$key]  $value1 <NULL> $sum"
 			fi
 		fi
+		echo $sum > tmp
 	fi
 done
 if [ $common = n ]
@@ -45,6 +46,7 @@ fi
 }
 
 find_null() {
+read sum < tmp
 cat $1 | grep -v ^# | while read line
 do
 	key=$(echo $line | awk -F = '{print $1}')
@@ -79,5 +81,7 @@ then
 	echo "Wrong params"
 	exit 1
 fi
+sum=0
 echo "config | $file1 | $file2 | sum"
 find_include_null $file1 $file2 # 找到$file1中有、$file2中没有的配置项以及$file1和$file2都有、但是值不同的配置项
+rm -rf tmp
