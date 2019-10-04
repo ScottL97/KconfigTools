@@ -66,7 +66,15 @@ CONFIG_GENERIC_HWEIGHT IN COMMON
 ...
 ```
 
-
+# modifyconfig
+## Advantage
+用于Linux内核配置文件批量比对，并以第二个参数指定的内核配置文件为标准，修改一定数量的配置项（可使用取半法），生成不同版本的配置文件，以排查导致内核启动失败的内核配置项。
+## Usage
+```
+$ ./modifyconfig config_failed config_success 58 1 参照config_success修改58项内核配置项，生成config_failed.1
+$ ./modifyconfig config_failed.1 config_success 29 1 参照config_success修改58项内核配置项，生成config_failed.2
+...
+```
 
 
 
