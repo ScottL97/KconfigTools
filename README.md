@@ -1,5 +1,5 @@
-# mylinuxtools
-自编的一些Linux实用小工具，用于在目录中的所有文本检索字段、文本比对等。
+# KconfigTools
+Kconfig配置对比、批量修改等相关的Linux工具。
 
 # 测试用例
 ```
